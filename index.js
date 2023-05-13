@@ -47,8 +47,23 @@ async function run() {
       res.send(result);
     });
 
+    // Orders
+
+    app.get("/orders", async (req, res) => {
+      console.log(req.query.email);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/orders", async (req, res) => {
       const order = req.body;
+      console.log(order);
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
