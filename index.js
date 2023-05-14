@@ -39,7 +39,7 @@ async function run() {
       const query = { _id: new ObjectId(id) };
 
       const options = {
-        // Include only the `title` and `imdb` fields in the returned document
+        // Include only the `title` and `` fields in the returned document
         projection: { title: 1, price: 1, service_id: 1, img: 1 },
       };
 
@@ -50,7 +50,7 @@ async function run() {
     // Orders
 
     app.get("/orders", async (req, res) => {
-      console.log(req.query.email);
+      // console.log(req.query.email);
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
@@ -61,9 +61,42 @@ async function run() {
 
     app.post("/orders", async (req, res) => {
       const order = req.body;
-      console.log(order);
+      // console.log(order);
       const result = await orderCollection.insertOne(order);
       res.send(result);
+    });
+
+    app.patch("/orders/:id", async (req, res) => {
+      // const updatedOrders = req.body;
+      // const id = req.params.id;
+      // const filter = { _id: new ObjectId(id) };
+      // const updateDoc = {
+      //   $set: {
+      //     status: updatedOrders.status,
+      //   },
+      // };
+      // const result = await orderCollection.updateOne(filter, updateDoc);
+      // res.send(result);
+      // -------------- ------ -----
+      res.send(
+        await orderCollection.updateOne(
+          { _id: new ObjectId(req.params.id) },
+          {
+            $set: { status: req.body.status },
+          }
+        )
+      );
+    });
+
+    app.delete("/orders/:id", async (req, res) => {
+      // const id = req.params.id;
+      // const query = { _id: new ObjectId(id) };
+      // const result = await orderCollection.deleteOne(query);
+      // res.send(result);
+
+      res.send(
+        await orderCollection.deleteOne({ _id: new ObjectId(req.params.id) })
+      );
     });
 
     // Send a ping to confirm a successful connection
