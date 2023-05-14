@@ -2,6 +2,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.PORT || 3300;
 
@@ -29,6 +30,18 @@ async function run() {
     const serviceCollection = client.db("carDoctor").collection("services");
     const orderCollection = client.db("carDoctor").collection("orders");
 
+    // jwt
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      // console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
+
+    //  services routes
+
     app.get("/services", async (req, res) => {
       const cursor = await serviceCollection.find().toArray();
       res.send(cursor);
@@ -47,8 +60,7 @@ async function run() {
       res.send(result);
     });
 
-    // Orders
-
+    // Orders Routes
     app.get("/orders", async (req, res) => {
       // console.log(req.query.email);
       let query = {};
@@ -67,17 +79,6 @@ async function run() {
     });
 
     app.patch("/orders/:id", async (req, res) => {
-      // const updatedOrders = req.body;
-      // const id = req.params.id;
-      // const filter = { _id: new ObjectId(id) };
-      // const updateDoc = {
-      //   $set: {
-      //     status: updatedOrders.status,
-      //   },
-      // };
-      // const result = await orderCollection.updateOne(filter, updateDoc);
-      // res.send(result);
-      // -------------- ------ -----
       res.send(
         await orderCollection.updateOne(
           { _id: new ObjectId(req.params.id) },
@@ -89,11 +90,6 @@ async function run() {
     });
 
     app.delete("/orders/:id", async (req, res) => {
-      // const id = req.params.id;
-      // const query = { _id: new ObjectId(id) };
-      // const result = await orderCollection.deleteOne(query);
-      // res.send(result);
-
       res.send(
         await orderCollection.deleteOne({ _id: new ObjectId(req.params.id) })
       );
